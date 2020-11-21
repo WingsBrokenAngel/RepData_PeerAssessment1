@@ -9,36 +9,48 @@ output:
 ## Loading and preprocessing the data
 Unzip and read the csv file named "activity.csv". 
 Remove the NA steps in the data.
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 raw_data <- read.csv(unz("activity.zip", "activity.csv"))
 data <- raw_data[!is.na(raw_data$steps),]
 ```
 
 ## What is mean total number of steps taken per day?
 
-```{r mean, echo=TRUE, results="asis", cache=TRUE}
+
+```r
 steps.by.day <- tapply(data$steps, data$date, sum)
 mean.steps <- as.integer(round(mean(steps.by.day)))
 median.steps <- median(steps.by.day)
 ```
 
-The mean total number of steps taken per day is `r mean.steps` and the median is `r median.steps`.
+The mean total number of steps taken per day is 10766 and the median is 10765.
 
 ## What is the average daily activity pattern?
 
-```{r pattern, echo=TRUE, results="asis", cache=TRUE}
+
+```r
 library(ggplot2)
 steps.by.min <- tapply(data$steps, data$interval, mean)
 qplot(steps.by.min, xlab = "Interval", ylab = "Count")
+```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](PA1_template_files/figure-html/pattern-1.png)<!-- -->
+
+```r
 max.interval <- steps.by.min[which.max(steps.by.min)]
 max.name <- names(max.interval)
 ```
 
-The `r max.name` 5-minute interval contains the maximum number of steps: `r max.interval`.
+The 835 5-minute interval contains the maximum number of steps: 206.1698113.
 
 ## Imputing missing values
-```{R missing, echo=TRUE, results="asis", cache=TRUE}
+
+```r
 num.missing <- sum(is.na(raw_data))
 filled.data <- raw_data
 
@@ -52,20 +64,29 @@ for(interval in names(steps.by.min)) {
 steps.by.day2 <- tapply(filled.data$steps, filled.data$date, sum)
 
 qplot(steps.by.day2, xlab = "Steps", ylab = "Count")
+```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](PA1_template_files/figure-html/missing-1.png)<!-- -->
+
+```r
 mean.steps2 <- as.integer(round(mean(steps.by.day2)))
 median.steps2 <- as.integer(round(median(steps.by.day2)))
 ```
 
 
-- The total number of missing values in the dataset is `r num.missing`.
-- After filling the missing steps, the mean total number of steps taken per day is `r mean.steps2`, 
-and the median is `r median.steps2`.
+- The total number of missing values in the dataset is 2304.
+- After filling the missing steps, the mean total number of steps taken per day is 10766, 
+and the median is 10766.
 - The mean and median values, before and after filling the missing steps, are almost the same.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r differences, echo=TRUE, results="asis", cache=TRUE}
+
+```r
 library(chron)
 filled.data$weekday <- as.factor(is.weekend(filled.data$date))
 levels(filled.data$weekday) <- c("weekday", "weekend") 
@@ -80,6 +101,8 @@ plot(names(weekday.by.interval), weekday.by.interval,
 
 plot(names(weekend.by.interval), weekend.by.interval, 
      type = "l", xlab = "Interval", ylab = "Steps", main = "Steps by Interval in Weekend")
-``` 
+```
+
+![](PA1_template_files/figure-html/differences-1.png)<!-- -->
 
 The plot has been made as shown in above.
